@@ -25,9 +25,22 @@ def test_post(db: Session = Depends(get_db)):
     return {"message": "success"}
 
 
+@app.post("/posts", status_code=status.HTTP_201_CREATED)
+def create_post(post:Post, db:Session= Depends(get_db)):
+    new_post = models.Post(**post.dict())
+    db.add(new_post)
+    db.commit()
+    db.refresh(new_post)
+
+    return{
+        "data": new_post
+    }
 
 
-
+@app.get("/posts", status_code=status.HTTP_200_OK)
+def get_all_posts(db: Session = Depends(get_db)):
+    posts = db.query(models.Post).all()
+    return {"data": posts}
 
 
 
