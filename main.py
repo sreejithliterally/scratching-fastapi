@@ -1,46 +1,29 @@
-from datetime import time
-from fastapi import FastAPI, status, HTTPException, Response, Depends
-from pydantic import BaseModel
-from sqlalchemy.orm import Session
+from fastapi import FastAPI
+
 import models
-from database import engine, get_db
-
-
+from database import engine
+from routers import post, user
 
 app = FastAPI()
 
 models.Base.metadata.create_all(bind=engine)
 
-class Post(BaseModel):
-    title: str
-    content: str
-    published: bool = True
+app.include_router(post.router)
+app.include_router(user.router)
 
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
 
-@app.get("/sqlalchemy")
-def test_post(db: Session = Depends(get_db)):
-    return {"message": "success"}
 
 
-@app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_post(post:Post, db:Session= Depends(get_db)):
-    new_post = models.Post(**post.dict())
-    db.add(new_post)
-    db.commit()
-    db.refresh(new_post)
-
-    return{
-        "data": new_post
-    }
 
 
-@app.get("/posts", status_code=status.HTTP_200_OK)
-def get_all_posts(db: Session = Depends(get_db)):
-    posts = db.query(models.Post).all()
-    return {"data": posts}
+
+    
+
+
+
 
 
 
