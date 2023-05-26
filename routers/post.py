@@ -30,6 +30,7 @@ def create_post(post:schemas.CreatePost, db:Session= Depends(get_db),current_use
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
+    print(current_user.email)
 
     return new_post
 
